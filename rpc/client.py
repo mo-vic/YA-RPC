@@ -19,18 +19,20 @@ class Client:
         self.rpcs = ret["rpcs"]
 
     def generate_stubs(self):
-        for name, func in (self.make_func(rpc["name"]) for rpc in self.rpcs):
-            setattr(self, name, func)
+        for rpc in self.rpcs:
+            name = rpc["name"]
 
-    def make_func(self, name):
-        def func(*args, **kwargs):
-            msg = {"type": "call", "name": name, "args": args, "kwargs": kwargs}
-            self.connector.send(msg)
-            obj = self.connector.receive()
+            def make_func(name):
+                def func(*args, **kwargs):
+                    msg = {"type": "call", "name": name, "args": args, "kwargs": kwargs}
+                    self.connector.send(msg)
+                    obj = self.connector.receive()
 
-            if isinstance(obj, Exception):
-                raise obj
-            else:
-                return obj
+                    if isinstance(obj, Exception):
+                        raise obj
+                    else:
+                        return obj
 
-        return name, func
+                return func
+
+            setattr(self, name, make_func(name))
