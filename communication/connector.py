@@ -32,7 +32,7 @@ class ClientConnector(Connector):
         self.socket.connect((self.ip, self.port))
 
     def send(self, obj):
-        msg = pickle.dumps(obj)
+        msg = pickle.dumps(obj, protocol=4)
         self.socket.sendall(msg)
 
     def receive(self, buffsize=None):
