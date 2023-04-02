@@ -15,6 +15,7 @@ class Listener:
         # save the active ServerConnector objects
         self.server_id = 0
         self.server_dict = dict()
+        self.server_dict[self.server_id] = self.listener
         self.server_dict_lock = threading.Lock()
 
     def register_procedure(self, procedure):
@@ -55,6 +56,7 @@ class Listener:
         # delete the active ServerConnector object from the server_dict, this will dereference to the ServerConnector
         # object and thus the connection object can be successfully garbage collected when the thread exit
         with self.server_dict_lock:
+            conn.close()
             self.server_dict.pop(server_id)
 
     def listen(self):
